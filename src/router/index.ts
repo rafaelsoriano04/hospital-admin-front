@@ -37,6 +37,11 @@ const router = createRouter({
       name: 'medicos',
       component: () => import('@/modules/medicos/Medicos.vue'),
     },
+    {
+      path: '/usuarios',
+      name: 'usuarios',
+      component: () => import('@/modules/usuarios/Usuarios.vue'),
+    },
     // {
     //   path: '/pacientes',
     //   name: 'Pacientes',
