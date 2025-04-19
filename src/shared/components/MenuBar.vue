@@ -61,6 +61,12 @@ const menuItems = ref<MenuItem[]>([
     command: () => router.push({ name: 'consultas_medicas' }),
     routeName: 'consultas_medicas',
   },
+  {
+    label: 'Control de Usuarios',
+    icon: 'pi pi-fw pi-user',
+    command: () => router.push({ name: 'usuarios' }),
+    routeName: 'usuarios',
+  }
 ]);
 
 const computedMenuItems = computed(() =>
@@ -143,7 +149,7 @@ const menubarStyle = ref({
       display: flex;
       flex-wrap: nowrap;
       width: 100%;
-      padding: 1.3rem 1.2rem;
+      padding: 1rem 1.2rem;
 
       .p-menu-item-icon {
         font-size: 17px;
