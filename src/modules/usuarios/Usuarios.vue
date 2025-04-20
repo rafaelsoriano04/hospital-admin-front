@@ -62,15 +62,16 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-import Dialog from 'primevue/dialog';  // Importa el componente Dialog
+import Dialog from 'primevue/dialog';  
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 
 import Password from 'primevue/password';
+import { useAppStore } from '@/stores/app-store';
 
 
-
-const apiUrl = 'http://localhost:3000/api';
+const store = useAppStore();
+const apiUrl = store.apiUrl;
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }

@@ -69,12 +69,16 @@ interface FormValues {
   password: string;
 }
 
+
+
 const router = useRouter();
 const store = useAppStore();
 const initialValues = ref<FormValues>({
   username: '',
   password: '',
 });
+
+const apiUrl = store.apiUrl;
 
 const resolver = ({
   values,
@@ -101,14 +105,48 @@ const onFormSubmit = ({ valid }: FormSubmitEvent<Record<string, any>>): void => 
   }
 };
 
-const login = () => {
-  if (initialValues.value.username === 'admin' && initialValues.value.password === 'admin') {
-    store.token = 'fake-token';
+const login = async () => {
+  try {
+    const response = await fetch(apiUrl + '/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(initialValues.value),
+    });
+
+    if (!response.ok) {
+      throw new Error('Credenciales inválidas');
+    }
+
+    const data = await response.json();
+
+    const payload = decodeToken(data.token);
+
+    if (!payload || payload.role !== 'admin') {
+      throw new Error('Acceso denegado. Solo administradores.');
+    }
+
+    store.token = data.token;
+    localStorage.setItem('token', data.token); // si quieres persistir
+
     router.push({ name: 'home' });
-  } else {
-    alert('Credenciales inválidas');
+  } catch (error: any) {
+    alert(error.message || 'Error al iniciar sesión');
   }
 };
+
+function decodeToken(token: string) {
+  try {
+    const base64Payload = token.split('.')[1];
+    const payload = atob(base64Payload);
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
+}
+
+
 </script>
 
 <style scoped lang="scss">

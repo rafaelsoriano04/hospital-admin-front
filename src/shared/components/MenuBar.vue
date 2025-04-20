@@ -6,8 +6,15 @@
     <template #end>
       <Divider />
       <div class="user-info">
-        <Avatar label="AS" size="large" shape="circle" />
-        <p class="text-white">Alison Salas</p>
+        <Avatar
+          :label="userInitials"
+          size="large"
+          shape="circle"
+          class="user-avatar"
+          @click="toggleMenu"
+        />
+        <p class="username">{{ username }}</p>
+        <Menu ref="menu" :model="userMenuItems" :popup="true" />
       </div>
     </template>
   </Menu>
@@ -16,23 +23,81 @@
 <script setup lang="ts">
 import Menu from 'primevue/menu';
 import Avatar from 'primevue/avatar';
-import type { MenuItem } from 'primevue/menuitem';
+import Divider from 'primevue/divider';
 import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { Divider } from 'primevue';
+import { useAppStore } from '@/stores/app-store';
 
+// Usamos el store
 const router = useRouter();
 const route = useRoute();
+const store = useAppStore();
+const menu = ref(null);
 
-const menuItems = ref<MenuItem[]>([
+// Decodificar el token y obtener el nombre
+function decodeToken(token: string) {
+  try {
+    const base64Payload = token.split('.')[1];
+    const payload = atob(base64Payload);
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
+}
+
+function getNameFromToken(token: string): string {
+  const payload = decodeToken(token);
+  return payload ? payload.username : '';
+}
+
+// Computed para obtener el nombre del usuario
+const username = computed(() => {
+  return getNameFromToken(store.token);
+});
+
+const userInitials = computed(() => {
+  const name = username.value;
+  if (name) {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+  }
+  return '';
+});
+
+// Función de logout
+const logout = () => {
+  store.token = '';
+  router.push({ name: 'login' });
+};
+
+// Menú desplegable del usuario
+const userMenuItems = ref([
   {
-    label: 'Centros Medicos',
+    label: 'Cerrar sesión',
+    icon: 'pi pi-sign-out',
+    command: logout,
+  },
+]);
+
+// Mostrar/ocultar menú desplegable
+const toggleMenu = (event: Event) => {
+  if (menu.value) {
+    (menu.value as any).toggle(event);
+  }
+};
+
+// Menu items
+const menuItems = ref([
+  {
+    label: 'Centros Médicos',
     icon: 'pi pi-fw pi-building',
     command: () => router.push({ name: 'centros_medicos' }),
     routeName: 'centros_medicos',
   },
   {
-    label: 'Medicos',
+    label: 'Médicos',
     icon: 'fas fa-user-doctor',
     command: () => router.push({ name: 'medicos' }),
     routeName: 'medicos',
@@ -56,7 +121,7 @@ const menuItems = ref<MenuItem[]>([
     routeName: 'pacientes',
   },
   {
-    label: 'Consultas Medicas',
+    label: 'Consultas Médicas',
     icon: 'pi pi-fw pi-calendar',
     command: () => router.push({ name: 'consultas_medicas' }),
     routeName: 'consultas_medicas',
@@ -66,14 +131,14 @@ const menuItems = ref<MenuItem[]>([
     icon: 'pi pi-fw pi-user',
     command: () => router.push({ name: 'usuarios' }),
     routeName: 'usuarios',
-  }
+  },
 ]);
 
 const computedMenuItems = computed(() =>
   menuItems.value.map((item) => ({
     ...item,
     class: item.routeName === route.name ? 'active-menu-item' : '',
-  })),
+  }))
 );
 
 const menubarStyle = ref({
@@ -180,7 +245,7 @@ const menubarStyle = ref({
   .p-menu-end {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Alinea el contenido a la izquierda */
     gap: 0.5rem;
     margin-bottom: 1rem;
     padding: 0 2rem;
@@ -191,7 +256,21 @@ const menubarStyle = ref({
       align-items: center;
       color: #fff;
       gap: 1rem;
+      width: 100%;
+      cursor: pointer;
+
+      .user-avatar {
+        cursor: pointer;
+      }
+
+      .username {
+        margin: 0;
+        font-size: 1rem;
+        color: #fff;
+      }
     }
   }
+
+  
 }
 </style>
