@@ -11,9 +11,8 @@
                     <InputText v-model="filters.global.value" placeholder="Búsqueda general" />
                 </IconField>
                 <div class="buttons">
-                    <Button label="Eliminar filtros" icon="pi pi-times" variant="text" severity="info"
-                        @click="deleteFilters()" />
-                    <Button label="Agregar" icon="pi pi-plus" @click="openModal" />
+                    <Button label="Eliminar filtros" icon="pi pi-times" variant="text" severity="info" @click="deleteFilters()" />
+                    <Button label="Agregar" icon="pi pi-plus" @click="() => openModal()" />
                 </div>
             </div>
 
@@ -22,28 +21,40 @@
                 <Column field="username" header="Usuario" :showFilterMenu="false" sortable />
                 <Column field="role" header="Rol" :showFilterMenu="false" sortable />
                 <Column header="Acciones">
-                    <template #body>
-                        <Button icon="pi pi-pencil" severity="info" variant="text" />
-                        <Button icon="pi pi-trash" severity="danger" variant="text" />
+                    <template #body="slotProps">
+                        <Button icon="pi pi-pencil" severity="info" variant="text" @click="() => openModal(slotProps.data)" />
+                        <Button icon="pi pi-trash" severity="danger" variant="text" 
+                                @click="() => deleteUser(slotProps.data.id)" />
                     </template>
                 </Column>
-
                 <template #empty>No se encontraron usuarios.</template>
             </DataTable>
         </div>
     </div>
 
-    <!-- Modal para agregar un nuevo usuario -->
-    <Dialog header="Crear Usuario" v-model:visible="modalVisible" :modal="true" :closable="false"
-        :dismissable-mask="true" :style="{ width: '37vw'  }">
+    <!-- Modal -->
+    <Dialog :header="isEditing ? 'Editar Usuario' : 'Crear Usuario'" v-model:visible="modalVisible" :modal="true" :closable="false"
+        :dismissable-mask="true" :style="{ width: '37vw' }">
         <div class="inputs">
             <div class="username-password-container">
-                <InputText v-model="newUser.username" placeholder="Nombre de usuario" />
-                <Password v-model="newUser.password" placeholder="Password" toggleMask :feedback="false" />
+                <InputText 
+                    v-model="currentUser.username" 
+                    placeholder="Nombre de usuario" 
+                />
+                <Password 
+                    v-model="currentUser.password" 
+                    placeholder="Password" 
+                    toggleMask 
+                    :feedback="false" 
+                />
             </div>
-            <Dropdown v-model="newUser.role" :options="roles" optionLabel="label" optionValue="value"
-                placeholder="Seleccionar rol" />
-
+            <Dropdown 
+                v-model="currentUser.role" 
+                :options="roles" 
+                optionLabel="label" 
+                optionValue="value"
+                placeholder="Seleccionar rol" 
+            />
         </div>
         <template #footer>
             <Button label="Cancelar" icon="pi pi-times" @click="closeModal" />
@@ -53,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Divider from 'primevue/divider';
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode } from '@primevue/core/api';
@@ -62,35 +73,66 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-import Dialog from 'primevue/dialog';  
+import Dialog from 'primevue/dialog';
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
-
 import Password from 'primevue/password';
 import { useAppStore } from '@/stores/app-store';
-
 
 const store = useAppStore();
 const apiUrl = store.apiUrl;
 
+// Filtros para la tabla
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-const deleteFilters = () => {
-    filters.value.global.value = null;
-};
-
+// Datos de la aplicación
 const users = ref([]);
 const selectedUser = ref();
 const modalVisible = ref(false);
-const newUser = ref({ username: '', password: '', role: '' });
+const isEditing = ref(false);
+
+// Modelos de datos separados
+const newUser = ref({
+    id: '', // <-- agregado
+    username: '',
+    password: '',
+    role: 'general'
+});
+
+
+const editingUser = ref({
+    id: '',
+    username: '',
+    password: '',
+    role: ''
+});
+
+// Computed para usar con v-model
+const currentUser = computed({
+    get: () => isEditing.value ? editingUser.value : newUser.value,
+    set: (val) => {
+        if (isEditing.value) {
+            editingUser.value = val;
+        } else {
+            newUser.value = val;
+        }
+    }
+});
+
+// Opciones de roles
 const roles = [
     { label: 'Admin', value: 'admin' },
     { label: 'General', value: 'general' }
 ];
 
+// Funciones de utilidad
+const deleteFilters = () => {
+    filters.value.global.value = null;
+};
 
+// Operaciones CRUD
 const getUsers = async () => {
     try {
         const response = await axios.get(`${apiUrl}/auth/users`);
@@ -100,23 +142,69 @@ const getUsers = async () => {
     }
 };
 
-const openModal = () => {
-    modalVisible.value = true; 
-    
+const openModal = (user?: any) => {
+    if (user) {
+        editingUser.value = {
+            id: user.id,
+            username: user.username,
+            password: '',
+            role: user.role
+        };
+        isEditing.value = true;
+    } else {
+        isEditing.value = false;
+    }
+    modalVisible.value = true;
+};
+const closeModal = () => {
+    modalVisible.value = false;
+    // Resetear ambos formularios incluyendo el id
+    newUser.value = { id: '', username: '', password: '', role: 'general' };
+    editingUser.value = { id: '', username: '', password: '', role: '' };
 };
 
-const closeModal = () => {
-    modalVisible.value = false;  
-};
 
 const saveUser = async () => {
     try {
-        await axios.post(`${apiUrl}/auth/register`, newUser.value);  
-        users.value.push(newUser.value); 
-        closeModal(); 
-        newUser.value = { username: '', role: '' }; 
+        const current = currentUser.value;
+        if (!current.username || (!isEditing.value && !current.password)) {
+            alert("Username y password son requeridos");
+            return;
+        }
+
+        if (isEditing.value) {
+            await axios.put(`${apiUrl}/auth/users/${editingUser.value.id}`, {
+                username: editingUser.value.username,
+                password: editingUser.value.password || undefined,
+                role: editingUser.value.role
+            });
+        } else {
+            await axios.post(`${apiUrl}/auth/register`, {
+                username: newUser.value.username,
+                password: newUser.value.password,
+                role: newUser.value.role
+            });
+        }
+
+        await getUsers();
+        closeModal();
     } catch (error) {
         console.error('Error al guardar usuario:', error);
+        alert("Error al guardar. Verifica los datos.");
+    }
+};
+
+const deleteUser = async (userId: string) => {
+    if (!userId) return;
+
+    const confirmed = confirm('¿Estás seguro de eliminar este usuario?');
+    if (!confirmed) return;
+
+    try {
+        await axios.delete(`${apiUrl}/auth/users/${userId}`);
+        await getUsers();
+    } catch (error) {
+        console.error('Error al eliminar usuario:', error);
     }
 };
 
@@ -152,33 +240,23 @@ onMounted(() => {
                 gap: 1rem;
             }
         }
-
-        .p-datatable-inline-filter {
-            width: fit-content;
-
-            .p-datatable-filter-element-container {
-                flex: none;
-                width: fit-content;
-            }
-        }
     }
 }
 
 .inputs {
     display: flex;
-    flex-direction: column; /* El contenedor general se apilará en columna */
-    gap: 1.5rem;  /* Espacio entre los elementos */
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .username-password-container {
     display: flex;
-    gap: 1.5rem;  /* Espacio entre el input de usuario y el de contraseña */
+    gap: 1.5rem;
 }
 
-.inputs input, 
-.inputs select, 
+.inputs input,
+.inputs select,
 .inputs .p-password {
-    width: 100%;  /* Asegura que los inputs y select ocupen todo el ancho disponible */
+    width: 100%;
 }
-
 </style>
