@@ -186,7 +186,7 @@ const store = useAppStore();
 const apiUrl = store.apiUrl;
 
 const apiClient = axios.create({
-  baseURL: apiUrl, 
+  baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -226,7 +226,12 @@ const editModalVisible = ref(false);
 const deleteModalVisible = ref(false);
 
 const newMedico = ref({ nombre: '', especialidad_id: null, centro_medico_id: null });
-const editMedico = ref<{ id: number | null; nombre: string; especialidad_id: number | null; centro_medico_id: number | null }>({
+const editMedico = ref<{
+  id: number | null;
+  nombre: string;
+  especialidad_id: number | null;
+  centro_medico_id: number | null;
+}>({
   id: null,
   nombre: '',
   especialidad_id: null,
@@ -288,7 +293,11 @@ const closeAddModal = () => {
 
 // Guardar nuevo médico
 const saveMedico = async () => {
-  if (!newMedico.value.nombre || !newMedico.value.especialidad_id || !newMedico.value.centro_medico_id) {
+  if (
+    !newMedico.value.nombre ||
+    !newMedico.value.especialidad_id ||
+    !newMedico.value.centro_medico_id
+  ) {
     alert('Todos los campos son obligatorios');
     return;
   }
@@ -330,7 +339,11 @@ const closeEditModal = () => {
 
 // Actualizar médico
 const updateMedico = async () => {
-  if (!editMedico.value.nombre || !editMedico.value.especialidad_id || !editMedico.value.centro_medico_id) {
+  if (
+    !editMedico.value.nombre ||
+    !editMedico.value.especialidad_id ||
+    !editMedico.value.centro_medico_id
+  ) {
     alert('Todos los campos son obligatorios');
     return;
   }
@@ -396,13 +409,14 @@ onMounted(() => {
   gap: 1rem;
   margin-top: 1rem;
   width: 100%;
+  overflow: auto;
+  height: 100%;
 
   .table-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.7rem;
-    width: 100%;
 
     .actions {
       display: flex;
