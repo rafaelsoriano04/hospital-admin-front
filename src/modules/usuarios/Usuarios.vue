@@ -34,33 +34,45 @@
 
     <!-- Modal -->
     <Dialog :header="isEditing ? 'Editar Usuario' : 'Crear Usuario'" v-model:visible="modalVisible" :modal="true" :closable="false"
-        :dismissable-mask="true" :style="{ width: '37vw' }">
-        <div class="inputs">
-            <div class="username-password-container">
-                <InputText 
-                    v-model="currentUser.username" 
-                    placeholder="Nombre de usuario" 
-                />
-                <Password 
-                    v-model="currentUser.password" 
-                    placeholder="Password" 
-                    toggleMask 
-                    :feedback="false" 
-                />
-            </div>
-            <Dropdown 
-                v-model="currentUser.role" 
-                :options="roles" 
-                optionLabel="label" 
-                optionValue="value"
-                placeholder="Seleccionar rol" 
+    :dismissable-mask="true" :style="{ width: '37vw' }">
+    <div class="inputs">
+        <div class="username-password-container">
+            <InputText 
+                v-model="currentUser.username" 
+                placeholder="Nombre de usuario" 
+            />
+            <Password 
+                v-model="currentUser.password" 
+                placeholder="Password" 
+                toggleMask 
+                :feedback="false" 
             />
         </div>
-        <template #footer>
-            <Button label="Cancelar" icon="pi pi-times" @click="closeModal" />
-            <Button label="Guardar" icon="pi pi-check" @click="saveUser" />
-        </template>
-    </Dialog>
+
+        <Dropdown 
+            v-model="currentUser.role" 
+            :options="roles" 
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Seleccionar rol" 
+        />
+
+        <Dropdown 
+            v-if="currentUser.role === 'general'"
+            v-model="currentUser.centro"
+            :options="centros"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar centro médico"
+        />
+    </div>
+
+    <template #footer>
+        <Button label="Cancelar" icon="pi pi-times" @click="closeModal" />
+        <Button label="Guardar" icon="pi pi-check" @click="saveUser" />
+    </template>
+</Dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -98,15 +110,23 @@ const newUser = ref({
     id: '', // <-- agregado
     username: '',
     password: '',
-    role: 'general'
+    role: 'general',
+    centro:0
+    
 });
-
+const centros = ref([
+   
+    { label: 'Centro Médico Guayaquil', value: 2 },
+    { label: 'Centro Médico Cuenca', value: 3 }
+    
+]);
 
 const editingUser = ref({
     id: '',
     username: '',
     password: '',
-    role: ''
+    role: '',
+    centro:0
 });
 
 // Computed para usar con v-model
@@ -148,7 +168,8 @@ const openModal = (user?: any) => {
             id: user.id,
             username: user.username,
             password: '',
-            role: user.role
+            role: user.role,
+            centro:user.centro
         };
         isEditing.value = true;
     } else {
@@ -159,30 +180,36 @@ const openModal = (user?: any) => {
 const closeModal = () => {
     modalVisible.value = false;
     // Resetear ambos formularios incluyendo el id
-    newUser.value = { id: '', username: '', password: '', role: 'general' };
-    editingUser.value = { id: '', username: '', password: '', role: '' };
+    newUser.value = { id: '', username: '', password: '', role: 'general',centro:0 };
+    editingUser.value = { id: '', username: '', password: '', role: '',centro:0 };
 };
 
 
 const saveUser = async () => {
     try {
         const current = currentUser.value;
+        
         if (!current.username || (!isEditing.value && !current.password)) {
             alert("Username y password son requeridos");
             return;
+        }
+         if (current.role === 'admin') {
+            current.centro = 1;
         }
 
         if (isEditing.value) {
             await axios.put(`${apiUrl}/auth/users/${editingUser.value.id}`, {
                 username: editingUser.value.username,
                 password: editingUser.value.password || undefined,
-                role: editingUser.value.role
+                role: editingUser.value.role,
+                centro:editingUser.value.centro
             });
         } else {
             await axios.post(`${apiUrl}/auth/register`, {
                 username: newUser.value.username,
                 password: newUser.value.password,
-                role: newUser.value.role
+                role: newUser.value.role,
+                centro:current.centro
             });
         }
 
