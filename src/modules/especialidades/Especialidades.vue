@@ -129,7 +129,7 @@
     const apiUrl = store.apiUrl;
 
   const apiClient = axios.create({
-    baseURL: apiUrl, // URL del API Gateway
+    baseURL: 'http://34.23.223.70:3000/api',// URL del API Gateway
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
