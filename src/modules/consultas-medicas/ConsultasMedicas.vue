@@ -1,6 +1,7 @@
 <template>
     <h1 class="m-5">Consultas Médicas</h1>
     <Divider />
+    <Toast />
     <div class="container">
       <div class="table-container">
         <div class="actions">
@@ -118,6 +119,9 @@
   import Dialog from 'primevue/dialog';
   import axios from 'axios';
   import { useAppStore } from '@/stores/app-store';
+  import { useToast } from 'primevue/usetoast'; 
+
+  const toast = useToast();
   
   const store = useAppStore();
   const apiUrl = store.apiUrl;
@@ -176,9 +180,19 @@
     } catch (error) {
       console.error('Error al obtener consultas médicas:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || 'Error al obtener consultas médicas');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.response?.data?.message || 'Error al obtener consultas médicas',
+          life: 3000,
+        });
       } else {
-        alert('Error al obtener consultas médicas');
+       toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al obtener consultas médicas',
+          life: 3000,
+        });
       }
     }
   };
