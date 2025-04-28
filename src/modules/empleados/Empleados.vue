@@ -385,7 +385,7 @@
     align-items: center;
     gap: 1rem;
     margin-top: 1rem;
-    width: 100%;
+    width: fit-content;
   
     .table-container {
       display: flex;
