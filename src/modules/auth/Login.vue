@@ -51,6 +51,8 @@
         </template>
       </Image>
     </div>
+    <!-- Aquí agregamos el Toast para mostrar las notificaciones -->
+    <Toast />
   </div>
 </template>
 
@@ -63,13 +65,14 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import Image from 'primevue/image';
 import { useAppStore } from '@/stores/app-store';
+import { useToast } from 'primevue/usetoast'; 
 
 interface FormValues {
   username: string;
   password: string;
 }
 
-
+const toast = useToast(); // Usa el hook para acceder al servicio de Toast
 
 const router = useRouter();
 const store = useAppStore();
@@ -131,8 +134,21 @@ const login = async () => {
     localStorage.setItem('token', data.token); // si quieres persistir
 
     router.push({ name: 'home' });
+
+    // Muestra un toast al iniciar sesión correctamente
+    toast.add({
+      severity: 'success',
+      summary: 'Inicio de sesión exitoso',
+      detail: 'Bienvenido al sistema',
+      life: 3000,
+    });
   } catch (error: any) {
-    alert(error.message || 'Error al iniciar sesión');
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.message || 'Error al iniciar sesión',
+      life: 3000,
+    });
   }
 };
 
@@ -145,8 +161,6 @@ function decodeToken(token: string) {
     return null;
   }
 }
-
-
 </script>
 
 <style scoped lang="scss">
