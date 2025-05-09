@@ -272,6 +272,10 @@ const deleteUser = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar usuario', life: 3000 });
     }
 };
+const getCentroNombre = (centroId: number) => {
+    const centro = centros.value.find(c => c.value === centroId);
+    return centro ? centro.label : 'Desconocido';
+};
 
 onMounted(() => {
     getUsers();
