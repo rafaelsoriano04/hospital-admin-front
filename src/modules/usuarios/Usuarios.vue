@@ -117,7 +117,9 @@ const newUser = ref({
 const centros = ref([
    
     { label: 'Centro Médico Guayaquil', value: 2 },
-    { label: 'Centro Médico Cuenca', value: 3 }
+    { label: 'Centro Médico Cuenca', value: 3 },
+    {label:'Centro Medico Latacunga',value:4}
+ 
     
 ]);
 
