@@ -1,6 +1,7 @@
 <template>
     <h1 class="m-5">Empleados</h1>
     <Divider />
+    <Toast />
     <div class="container">
       <div class="table-container">
         <div class="actions">
@@ -160,6 +161,9 @@
   import Select from 'primevue/select';
   import axios from 'axios';
   import { useAppStore } from '@/stores/app-store';
+  import { useToast } from 'primevue/usetoast'; 
+
+  const toast = useToast();
   
   const store = useAppStore();
   const apiUrl = store.apiUrl;
@@ -217,9 +221,10 @@
     try {
       const response = await apiClient.get('/admin/centros-medicos');
       centrosMedicos.value = response.data;
+
     } catch (error) {
       console.error('Error al obtener centros médicos:', error);
-      alert('Error al cargar centros médicos');
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error al obtener centros médicos', life: 3000 });
     }
   };
   
@@ -231,9 +236,19 @@
     } catch (error) {
       console.error('Error al obtener empleados:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || 'Error al obtener empleados');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.response?.data?.message || 'Error al obtener empleados',
+          life: 3000,
+        });
       } else {
-        alert('Error al obtener empleados');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al obtener empleados',
+          life: 3000,
+        });
       }
     }
   };
@@ -252,7 +267,8 @@
   // Guardar nuevo empleado
   const saveEmpleado = async () => {
     if (!newEmpleado.value.nombre || !newEmpleado.value.centro_medico_id) {
-      alert('El nombre y el centro médico son obligatorios');
+      
+      toast.add({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre y el centro médico son obligatorios', life: 3000 });
       return;
     }
     try {
@@ -264,13 +280,15 @@
       await apiClient.post('/admin/empleados', payload);
       await getEmpleados(); // Refrescar la lista
       closeAddModal();
-      alert('Empleado creado exitosamente');
+      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Empleado creado exitosamente', life: 3000 });
+      
     } catch (error) {
       console.error('Error al guardar empleado:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || 'Error al guardar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Error al guardar empleado', life: 3000 });
       } else {
-        alert('Error al guardar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar empleado', life: 3000 });
+       
       }
     }
   };
@@ -299,7 +317,7 @@
   // Actualizar empleado
   const updateEmpleado = async () => {
     if (!editEmpleado.value.nombre || !editEmpleado.value.centro_medico_id) {
-      alert('El nombre y el centro médico son obligatorios');
+      toast.add({ severity: 'warn', summary: 'Advertencia', detail: 'El nombre y el centro médico son obligatorios', life: 3000 });
       return;
     }
     try {
@@ -311,13 +329,13 @@
       await apiClient.put(`/admin/empleados/${editEmpleado.value.id}`, payload);
       await getEmpleados(); // Refrescar la lista
       closeEditModal();
-      alert('Empleado actualizado exitosamente');
+      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Empleado actualizado exitosamente', life: 3000 });
     } catch (error) {
       console.error('Error al actualizar empleado:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || 'Error al actualizar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Error al actualizar empleado', life: 3000 });
       } else {
-        alert('Error al actualizar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error al actualizar empleado', life: 3000 });
       }
     }
   };
@@ -342,13 +360,13 @@
       }
       await getEmpleados(); // Refrescar la lista
       closeDeleteModal();
-      alert('Empleado eliminado exitosamente');
+      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Empleado eliminado exitosamente', life: 3000 });
     } catch (error) {
       console.error('Error al eliminar empleado:', error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || 'Error al eliminar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Error al eliminar empleado', life: 3000 });
       } else {
-        alert('Error al eliminar empleado');
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar empleado', life: 3000 });
       }
     }
   };
@@ -367,7 +385,7 @@
     align-items: center;
     gap: 1rem;
     margin-top: 1rem;
-    width: 100%;
+    width: fit-content;
   
     .table-container {
       display: flex;

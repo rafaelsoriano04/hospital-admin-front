@@ -72,12 +72,12 @@ const logout = () => {
   router.push({ name: 'login' });
 };
 
-// Menú desplegable del usuario
 const userMenuItems = ref([
   {
     label: 'Cerrar sesión',
     icon: 'pi pi-sign-out',
     command: logout,
+    class: 'logout-menu-item',
   },
 ]);
 
@@ -138,7 +138,7 @@ const computedMenuItems = computed(() =>
   menuItems.value.map((item) => ({
     ...item,
     class: item.routeName === route.name ? 'active-menu-item' : '',
-  }))
+  })),
 );
 
 const menubarStyle = ref({
@@ -214,14 +214,14 @@ const menubarStyle = ref({
       display: flex;
       flex-wrap: nowrap;
       width: 100%;
-      padding: 1rem 1.2rem;
+      padding: 0.8rem 1rem;
 
       .p-menu-item-icon {
-        font-size: 17px;
+        font-size: 16px;
         color: #fff;
       }
       .p-menu-item-label {
-        font-size: 17px;
+        font-size: 16px;
         color: #fff;
         white-space: nowrap;
       }
@@ -267,10 +267,9 @@ const menubarStyle = ref({
         margin: 0;
         font-size: 1rem;
         color: #fff;
+        max-width: 7rem;
       }
     }
   }
-
-  
 }
 </style>

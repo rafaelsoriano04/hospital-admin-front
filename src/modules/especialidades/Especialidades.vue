@@ -1,6 +1,7 @@
 <template>
     <h1 class="m-5">Especialidades</h1>
     <Divider />
+    <Toast />
     <div class="container">
       <div class="table-container">
         <div class="actions">
@@ -119,6 +120,9 @@
   import Dialog from "primevue/dialog";
   import axios from "axios";
   import { useAppStore } from '@/stores/app-store';
+  import { useToast } from 'primevue/usetoast'; 
+
+  const toast = useToast();
   
 
   const store = useAppStore();
@@ -167,9 +171,20 @@
     } catch (error) {
       console.error("Error al obtener especialidades:", error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error al obtener especialidades");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: error.response?.data?.message || "Error al obtener especialidades",
+          life: 3000
+        });
+        
       } else {
-        alert("Error al obtener especialidades");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Error al obtener especialidades",
+          life: 3000
+        });
       }
     }
   };
@@ -192,13 +207,28 @@
       await apiClient.post("/admin/especialidades",JSON.parse(JSON.stringify(newEspecialidad.value)) );
       await getEspecialidades(); 
       closeAddModal();
-      alert("Especialidad creada exitosamente");
+      toast.add({
+        severity: "success",
+        summary: "Éxito",
+        detail: "Especialidad creada exitosamente",
+        life: 3000
+      });
     } catch (error) {
       console.error("Error al guardar especialidad:", error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error al guardar especialidad");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: error.response?.data?.message || "Error al guardar especialidad",
+          life: 3000
+        });
       } else {
-        alert("Error al guardar especialidad");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Error al guardar especialidad",
+          life: 3000
+        });
       }
     }
   };
@@ -220,13 +250,28 @@
       await apiClient.put(`/admin/especialidades/${editEspecialidad.value.id}`, editEspecialidad.value);
       await getEspecialidades(); // Refrescar la lista
       closeEditModal();
-      alert("Especialidad actualizada exitosamente");
+      toast.add({
+        severity: "success",
+        summary: "Éxito",
+        detail: "Especialidad actualizada exitosamente",
+        life: 3000
+      });
     } catch (error) {
       console.error("Error al actualizar especialidad:", error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error al actualizar especialidad");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: error.response?.data?.message || "Error al actualizar especialidad",
+          life: 3000
+        });
       } else {
-        alert("Error al actualizar especialidad");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: "Error al actualizar especialidad",
+          life: 3000
+        });
       }
     }
   };
@@ -251,14 +296,29 @@
       }
       await getEspecialidades(); // Refrescar la lista
       closeDeleteModal();
-      alert("Especialidad eliminada exitosamente");
+      toast.add({
+        severity: "success",
+        summary: "Éxito",
+        detail: "Especialidad eliminada exitosamente",
+        life: 3000
+      });
     } catch (error) {
       console.error("Error al eliminar especialidad:", error);
       if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message || "Error al eliminar especialidad");
+        toast.add({
+          severity: "error",
+          summary: "Error",
+          detail: error.response?.data?.message || "Error al eliminar especialidad",
+          life: 3000
+        });
       } else {
-        alert("Error al eliminar especialidad");
-      }
+      toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: "Error al eliminar especialidad",
+              life: 3000
+            });
+            }
     }
   };
   
@@ -275,7 +335,7 @@
     align-items: center;
     gap: 1rem;
     margin-top: 1rem;
-    width: 100%;
+    width: fit-content;
   
     .table-container {
       display: flex;
