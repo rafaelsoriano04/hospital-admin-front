@@ -230,7 +230,12 @@ const editModalVisible = ref(false);
 const deleteModalVisible = ref(false);
 
 const newMedico = ref({ nombre: '', especialidad_id: null, centro_medico_id: null });
-const editMedico = ref<{ id: number | null; nombre: string; especialidad_id: number | null; centro_medico_id: number | null }>({
+const editMedico = ref<{
+  id: number | null;
+  nombre: string;
+  especialidad_id: number | null;
+  centro_medico_id: number | null;
+}>({
   id: null,
   nombre: '',
   especialidad_id: null,
@@ -482,7 +487,6 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     gap: 0.7rem;
-    width: 100%;
 
     .actions {
       display: flex;

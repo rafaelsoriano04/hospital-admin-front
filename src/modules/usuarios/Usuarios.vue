@@ -78,10 +78,9 @@
         El centro médico es requerido *
         </span>
     </div>
-
     <template #footer>
-        <Button label="Cancelar" icon="pi pi-times" @click="closeModal" />
-        <Button label="Guardar" icon="pi pi-check" @click="saveUser" />
+      <Button label="Cancelar" icon="pi pi-times" @click="closeModal" />
+      <Button label="Guardar" icon="pi pi-check" @click="saveUser" />
     </template>
 </Dialog>
 
@@ -127,7 +126,7 @@ const deleteModalVisible = ref(false);
 const userToDelete = ref<{ id: number | null; username: string } | null>(null);
 
 const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
 const users = ref([]);
@@ -152,31 +151,30 @@ const centros = ref([
 ]);
 
 const editingUser = ref({
-    id: '',
-    username: '',
-    password: '',
-    role: '',
-    centro:0
+  id: '',
+  username: '',
+  password: '',
+  role: '',
 });
 
 const currentUser = computed({
-    get: () => isEditing.value ? editingUser.value : newUser.value,
-    set: (val) => {
-        if (isEditing.value) {
-            editingUser.value = val;
-        } else {
-            newUser.value = val;
-        }
+  get: () => (isEditing.value ? editingUser.value : newUser.value),
+  set: (val) => {
+    if (isEditing.value) {
+      editingUser.value = val;
+    } else {
+      newUser.value = val;
     }
+  },
 });
 
 const roles = [
-    { label: 'Admin', value: 'admin' },
-    { label: 'General', value: 'general' }
+  { label: 'Admin', value: 'admin' },
+  { label: 'General', value: 'general' },
 ];
 
 const deleteFilters = () => {
-    filters.value.global.value = null;
+  filters.value.global.value = null;
 };
 
 const getUsers = async () => {
@@ -200,19 +198,18 @@ const closeDeleteModal = () => {
 };
 
 const openModal = (user?: any) => {
-    if (user) {
-        editingUser.value = {
-            id: user.id,
-            username: user.username,
-            password: '',
-            role: user.role,
-            centro:user.centro
-        };
-        isEditing.value = true;
-    } else {
-        isEditing.value = false;
-    }
-    modalVisible.value = true;
+  if (user) {
+    editingUser.value = {
+      id: user.id,
+      username: user.username,
+      password: '',
+      role: user.role,
+    };
+    isEditing.value = true;
+  } else {
+    isEditing.value = false;
+  }
+  modalVisible.value = true;
 };
 
 const closeModal = () => {
@@ -278,7 +275,7 @@ const getCentroNombre = (centroId: number) => {
 };
 
 onMounted(() => {
-    getUsers();
+  getUsers();
 });
 </script>
 
@@ -292,42 +289,41 @@ onMounted(() => {
     margin-top: 1rem;
     width: fit-content;
 
-    .table-container {
+  .table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 1rem;
+
+      .buttons {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.7rem;
-        width: 100%;
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 1rem;
-
-            .buttons {
-                display: flex;
-                gap: 1rem;
-            }
-        }
+        gap: 1rem;
+      }
     }
+  }
 }
 
 .inputs {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .username-password-container {
-    display: flex;
-    gap: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
 }
 
 .inputs input,
 .inputs select,
 .inputs .p-password {
-    width: 100%;
+  width: 100%;
 }
 .error-message {
   color: rgb(215, 125, 125); 

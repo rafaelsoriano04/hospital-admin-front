@@ -125,8 +125,8 @@
   const toast = useToast();
   
 
-  const store = useAppStore();
-    const apiUrl = store.apiUrl;
+const store = useAppStore();
+const apiUrl = store.apiUrl;
 
   const apiClient = axios.create({
     baseURL: 'http://34.23.223.70:3000/api',// URL del API Gateway
