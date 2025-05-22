@@ -170,7 +170,7 @@
   
   // Configuración de axios con interceptor para JWT
   const apiClient = axios.create({
-    baseURL: apiUrl, // URL del API Gateway (por ejemplo, http://localhost:3000/api)
+    baseURL: 'http://34.23.223.70:3000/api',// URL del API Gateway (por ejemplo, http://localhost:3000/api)
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
