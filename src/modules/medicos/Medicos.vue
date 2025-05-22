@@ -1,6 +1,7 @@
 <template>
   <h1 class="m-5">Médicos</h1>
   <Divider />
+  <Toast />
   <div class="container">
     <div class="table-container">
       <div class="actions">
@@ -181,12 +182,15 @@ import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
 import axios from 'axios';
 import { useAppStore } from '@/stores/app-store';
+import { useToast } from 'primevue/usetoast'; 
+
+const toast = useToast();
 
 const store = useAppStore();
 const apiUrl = store.apiUrl;
 
 const apiClient = axios.create({
-  baseURL: apiUrl,
+  baseURL: 'http://34.23.223.70:3000/api',
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -250,7 +254,13 @@ const getEspecialidades = async () => {
     especialidades.value = response.data;
   } catch (error) {
     console.error('Error al obtener especialidades:', error);
-    alert('Error al cargar especialidades');
+    
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error al cargar especialidades',
+      life: 3000,
+    });
   }
 };
 
@@ -261,7 +271,12 @@ const getCentrosMedicos = async () => {
     centrosMedicos.value = response.data;
   } catch (error) {
     console.error('Error al obtener centros médicos:', error);
-    alert('Error al cargar centros médicos');
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error al cargar centros médicos',
+      life: 3000,
+    });
   }
 };
 
@@ -273,9 +288,19 @@ const getMedicos = async () => {
   } catch (error) {
     console.error('Error al obtener médicos:', error);
     if (axios.isAxiosError(error)) {
-      alert(error.response?.data?.message || 'Error al obtener médicos');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error al obtener médicos',
+        life: 3000,
+      });
     } else {
-      alert('Error al obtener médicos');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al obtener médicos',
+        life: 3000,
+      });
     }
   }
 };
@@ -293,25 +318,41 @@ const closeAddModal = () => {
 
 // Guardar nuevo médico
 const saveMedico = async () => {
-  if (
-    !newMedico.value.nombre ||
-    !newMedico.value.especialidad_id ||
-    !newMedico.value.centro_medico_id
-  ) {
-    alert('Todos los campos son obligatorios');
+  if (!newMedico.value.nombre || !newMedico.value.especialidad_id || !newMedico.value.centro_medico_id) {
+   toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Todos los campos son obligatorios',
+      life: 3000,
+    });
     return;
   }
   try {
     await apiClient.post('/admin/medicos', newMedico.value);
     await getMedicos(); // Refrescar la lista
     closeAddModal();
-    alert('Médico creado exitosamente');
+    toast.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Médico guardado exitosamente',
+      life: 3000,
+    });
   } catch (error) {
     console.error('Error al guardar médico:', error);
     if (axios.isAxiosError(error)) {
-      alert(error.response?.data?.message || 'Error al guardar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error al guardar médico',
+        life: 3000,
+      });
     } else {
-      alert('Error al guardar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al guardar médico',
+        life: 3000,
+      });
     }
   }
 };
@@ -339,25 +380,41 @@ const closeEditModal = () => {
 
 // Actualizar médico
 const updateMedico = async () => {
-  if (
-    !editMedico.value.nombre ||
-    !editMedico.value.especialidad_id ||
-    !editMedico.value.centro_medico_id
-  ) {
-    alert('Todos los campos son obligatorios');
+  if (!editMedico.value.nombre || !editMedico.value.especialidad_id || !editMedico.value.centro_medico_id) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Todos los campos son obligatorios',
+      life: 3000,
+    });
     return;
   }
   try {
     await apiClient.put(`/admin/medicos/${editMedico.value.id}`, editMedico.value);
     await getMedicos(); // Refrescar la lista
     closeEditModal();
-    alert('Médico actualizado exitosamente');
+    toast.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Médico actualizado exitosamente',
+      life: 3000,
+    });
   } catch (error) {
     console.error('Error al actualizar médico:', error);
     if (axios.isAxiosError(error)) {
-      alert(error.response?.data?.message || 'Error al actualizar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error al actualizar médico',
+        life: 3000,
+      });
     } else {
-      alert('Error al actualizar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al actualizar médico',
+        life: 3000,
+      });
     }
   }
 };
@@ -382,13 +439,28 @@ const deleteMedico = async () => {
     }
     await getMedicos(); // Refrescar la lista
     closeDeleteModal();
-    alert('Médico eliminado exitosamente');
+    toast.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Médico eliminado exitosamente',
+      life: 3000,
+    });
   } catch (error) {
     console.error('Error al eliminar médico:', error);
     if (axios.isAxiosError(error)) {
-      alert(error.response?.data?.message || 'Error al eliminar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error al eliminar médico',
+        life: 3000,
+      });
     } else {
-      alert('Error al eliminar médico');
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al eliminar médico',
+        life: 3000,
+      });
     }
   }
 };
@@ -408,9 +480,7 @@ onMounted(() => {
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
-  width: 100%;
-  overflow: auto;
-  height: 100%;
+  width: fit-content;
 
   .table-container {
     display: flex;
